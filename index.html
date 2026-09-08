@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Financiamiento 2026 - Maxibásquetbol Osorno</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#0f2042',
+                            900: '#0a152d',
+                            950: '#050b18',
+                        },
+                        bball: {
+                            500: '#f97316',
+                            600: '#ea580c',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(15, 32, 66, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .bball-pattern {
+            background-image: radial-gradient(rgba(249, 115, 22, 0.15) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col bball-pattern">
+
+    <!-- HEADER SUPERIOR -->
+    <header class="sticky top-0 z-50 bg-navy-950/90 backdrop-blur-md border-b border-blue-900/50 shadow-2xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Izquierda: Pelota de Básquetbol + Título -->
+            <div class="flex items-center gap-4">
+                <div class="relative flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 text-white shadow-lg shadow-orange-500/30 transform hover:rotate-45 transition-transform duration-500">
+                    <i class="fa-solid fa-basketball text-2xl"></i>
+                    <span class="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-orange-500"></span>
+                    </span>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg sm:text-xl text-white tracking-tight flex items-center gap-2">
+                        MAXIBÁSQUETBOL OSORNO
+                        <span class="text-xs bg-blue-600/40 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded-full font-medium hidden sm:inline-block">2026</span>
+                    </h1>
+                    <p class="text-xs text-blue-300/80 font-medium">Club Deportivo, Social y Cultural</p>
+                </div>
+            </div>
+
+            <!-- Navegación Tab -->
+            <div class="flex items-center gap-2 bg-navy-900/80 p-1.5 rounded-xl border border-blue-800/40">
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-blue-600 text-white shadow-lg shadow-blue-600/30">
+                    <i class="fa-solid fa-chart-pie mr-1.5"></i> Dashboard
+                </button>
+                <button onclick="switchTab('carta')" id="tab-carta" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-blue-300 hover:text-white hover:bg-navy-800">
+                    <i class="fa-solid fa-file-lines mr-1.5"></i> Carta COLODEP
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- VISTA 1: DASHBOARD -->
+        <div id="view-dashboard" class="space-y-8">
+            
+            <!-- Banner de Presentación -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-900 via-navy-800 to-slate-900 p-6 sm:p-8 border border-blue-700/30 shadow-2xl">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-blue-200 pointer-events-none">
+                    <i class="fa-solid fa-basketball text-[220px]"></i>
+                </div>
+                <div class="relative z-10 max-w-3xl">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30 mb-3">
+                        <i class="fa-solid fa-handshake"></i> Solicitud de Financiamiento y Patrocinio
+                    </span>
+                    <h2 class="text-2xl sm:text-4xl font-black text-white mb-3 tracking-tight">
+                        Plan Anual de Actividades e Homenajes 2026
+                    </h2>
+                    <p class="text-blue-200/90 text-sm sm:text-base leading-relaxed">
+                        Presentación de proyectos conmemorativos ante el <strong class="text-white">Consejo Local de Deportes de Osorno (COLODEP)</strong> para el cofinanciamiento del 2do Campeonato Mario Negrón Molina y la Ceremonia de Reconocimiento a las Glorias del Baloncesto.
+                    </p>
+                </div>
+            </div>
+
+            <!-- CARDS KPI DE METRICAS CLAVE -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <!-- KPI 1 -->
+                <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-blue-500 shadow-lg relative overflow-hidden group hover:border-blue-400 transition-all">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-blue-300">Presupuesto Total</span>
+                        <div class="p-2 bg-blue-500/20 rounded-lg text-blue-400">
+                            <i class="fa-solid fa-sack-dollar text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-black text-white">$3.900.000</div>
+                    <p class="text-xs text-slate-400 mt-1">Monto global consolidado</p>
+                </div>
+
+                <!-- KPI 2 -->
+                <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-orange-500 shadow-lg relative overflow-hidden group hover:border-orange-400 transition-all">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-orange-300">2do Cto. M. Negrón</span>
+                        <div class="p-2 bg-orange-500/20 rounded-lg text-orange-400">
+                            <i class="fa-solid fa-trophy text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-black text-white">$1.200.000</div>
+                    <p class="text-xs text-slate-400 mt-1">02 y 03 de Octubre (70 asist.)</p>
+                </div>
+
+                <!-- KPI 3 -->
+                <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-emerald-500 shadow-lg relative overflow-hidden group hover:border-emerald-400 transition-all">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-300">Cena Homenaje</span>
+                        <div class="p-2 bg-emerald-500/20 rounded-lg text-emerald-400">
+                            <i class="fa-solid fa-award text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-black text-white">$2.700.000</div>
+                    <p class="text-xs text-slate-400 mt-1">14 de Noviembre (60 asist.)</p>
+                </div>
+
+                <!-- KPI 4 -->
+                <div class="glass-panel p-5 rounded-2xl border-l-4 border-l-purple-500 shadow-lg relative overflow-hidden group hover:border-purple-400 transition-all">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-purple-300">Homenajeados</span>
+                        <div class="p-2 bg-purple-500/20 rounded-lg text-purple-400">
+                            <i class="fa-solid fa-star text-lg"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-black text-white">4 Leyendas</div>
+                    <p class="text-xs text-slate-400 mt-1">Glorias del Básquetbol Local</p>
+                </div>
+            </div>
+
+            <!-- SECCIÓN DE GRÁFICOS Y DESGLOSE DE EVENTOS -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Gráfico de distribución financiera -->
+                <div class="glass-panel p-6 rounded-3xl lg:col-span-1 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-orange-500"></i> Distribución Presupuestaria
+                        </h3>
+                        <p class="text-xs text-slate-400 mb-6">Desglose de costos proyectados para las actividades 2026</p>
+                    </div>
+                    <div class="relative flex items-center justify-center my-auto py-4">
+                        <canvas id="budgetChart" class="max-h-[220px]"></canvas>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-800 text-xs text-slate-400 flex justify-between">
+                        <span>Campeonato: 30.8%</span>
+                        <span>Cena Homenaje: 69.2%</span>
+                    </div>
+                </div>
+
+                <!-- Detalle de los Eventos Programados -->
+                <div class="glass-panel p-6 rounded-3xl lg:col-span-2 space-y-6">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-check text-blue-400"></i> Cronograma de Actividades
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Evento 1 -->
+                        <div class="bg-navy-900/90 rounded-2xl p-5 border border-blue-800/40 relative overflow-hidden hover:border-blue-500/50 transition-all">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                                    OCTUBRE 02 - 03
+                                </span>
+                                <span class="text-xs font-semibold text-slate-400">$1.200.000</span>
+                            </div>
+                            <h4 class="font-bold text-white text-base mb-2">2do Campeonato Mario Negrón Molina</h4>
+                            <ul class="text-xs space-y-2 text-slate-300">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-location-dot text-blue-400 mt-0.5"></i>
+                                    <span><strong>Recinto:</strong> Gimnasio Liceo Eleuterio Ramírez</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-users text-blue-400 mt-0.5"></i>
+                                    <span><strong>Clubes:</strong> Fusión (Puerto Montt), Gimnástico Alemán (Llanquihue), Atl. Llanquihue y Maxibásquetbol Osorno</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-utensils text-blue-400 mt-0.5"></i>
+                                    <span><strong>Cierre:</strong> Cena de Camaradería (Ex Cruz Roja Bilbao - 70 personas)</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Evento 2 -->
+                        <div class="bg-navy-900/90 rounded-2xl p-5 border border-emerald-800/40 relative overflow-hidden hover:border-emerald-500/50 transition-all">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                    NOVIEMBRE 14
+                                </span>
+                                <span class="text-xs font-semibold text-slate-400">$2.700.000</span>
+                            </div>
+                            <h4 class="font-bold text-white text-base mb-2">Cena de Reconocimiento e Homenaje</h4>
+                            <ul class="text-xs space-y-2 text-slate-300">
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-clock text-emerald-400 mt-0.5"></i>
+                                    <span><strong>Horario:</strong> Sábado 14 de Nov, 19:00 hrs</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-location-dot text-emerald-400 mt-0.5"></i>
+                                    <span><strong>Recinto:</strong> Centro de Eventos "Club Osorno" (García Hurtado N° 959)</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-shield-halved text-emerald-400 mt-0.5"></i>
+                                    <span><strong>Rubros:</strong> Banquetería, galvanos, salón y equipos audiovisuales</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN HOMENAJEADOS -->
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl">
+                <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-medal text-amber-400"></i> Homenajeados de la Jornada
+                        </h3>
+                        <p class="text-xs text-slate-400">Trayectorias destacadas del básquetbol local y nacional</p>
+                    </div>
+                    <span class="text-xs bg-navy-900 border border-blue-800 text-blue-300 px-3 py-1 rounded-full self-start sm:self-auto">
+                        60 Asistentes confirmables
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Homenajeado 1 -->
+                    <div class="bg-navy-950/80 p-5 rounded-2xl border border-slate-800 hover:border-amber-500/50 transition-all flex flex-col justify-between group">
+                        <div>
+                            <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-lg mb-3 group-hover:scale-110 transition-transform">
+                                BH
+                            </div>
+                            <h4 class="font-bold text-white text-sm mb-1">Benjamín Henríquez Negrón</h4>
+                            <p class="text-xs text-amber-400 font-medium mb-2">Ex Selección de Osorno</p>
+                            <p class="text-xs text-slate-400 leading-relaxed">Destacado jugador de diferentes clubes a nivel local y seleccionado de Osorno por múltiples temporadas.</p>
+                        </div>
+                    </div>
+
+                    <!-- Homenajeado 2 -->
+                    <div class="bg-navy-950/80 p-5 rounded-2xl border border-slate-800 hover:border-amber-500/50 transition-all flex flex-col justify-between group">
+                        <div>
+                            <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-lg mb-3 group-hover:scale-110 transition-transform">
+                                EC
+                            </div>
+                            <h4 class="font-bold text-white text-sm mb-1">Eduardo Céspedes Santibáñez</h4>
+                            <p class="text-xs text-amber-400 font-medium mb-2">Docente y Entrenador</p>
+                            <p class="text-xs text-slate-400 leading-relaxed">Formador de múltiples generaciones de basquetbolistas en la comuna de Osorno.</p>
+                        </div>
+                    </div>
+
+                    <!-- Homenajeado 3 -->
+                    <div class="bg-navy-950/80 p-5 rounded-2xl border border-slate-800 hover:border-amber-500/50 transition-all flex flex-col justify-between group">
+                        <div>
+                            <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-lg mb-3 group-hover:scale-110 transition-transform">
+                                EL
+                            </div>
+                            <h4 class="font-bold text-white text-sm mb-1">Edilberto "Toto" López</h4>
+                            <p class="text-xs text-amber-400 font-medium mb-2">Ex C.D. Español</p>
+                            <p class="text-xs text-slate-400 leading-relaxed">Destacado exjugador del Club Deportivo Español y actual formador de diversas categorías locales.</p>
+                        </div>
+                    </div>
+
+                    <!-- Homenajeado 4 -->
+                    <div class="bg-navy-950/80 p-5 rounded-2xl border border-slate-800 hover:border-amber-500/50 transition-all flex flex-col justify-between group">
+                        <div>
+                            <div class="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-lg mb-3 group-hover:scale-110 transition-transform">
+                                AR
+                            </div>
+                            <h4 class="font-bold text-white text-sm mb-1">Armando "Tata" Rosas</h4>
+                            <p class="text-xs text-amber-400 font-medium mb-2">Ex C.D. Español / Osorno</p>
+                            <p class="text-xs text-slate-400 leading-relaxed">Emblemático exjugador del Club Deportivo Español y de la Selección de Osorno.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- VISTA 2: CARTA OFICIAL EN FORMATO DE IMPRESIÓN -->
+        <div id="view-carta" class="hidden space-y-6">
+            <div class="flex justify-end gap-3 max-w-4xl mx-auto">
+                <button onclick="window.print()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-xs flex items-center gap-2 shadow-lg transition-all">
+                    <i class="fa-solid fa-print"></i> Imprimir / Descargar PDF
+                </button>
+            </div>
+
+            <!-- HOJA CARTA BLANCA -->
+            <div class="bg-white text-slate-900 p-8 sm:p-14 rounded-2xl shadow-2xl max-w-4xl mx-auto border border-slate-200 text-sm leading-relaxed font-sans">
+                
+                <!-- Encabezado de la carta -->
+                <div class="border-b-2 border-blue-900 pb-4 mb-6 flex justify-between items-end">
+                    <div>
+                        <h2 class="font-extrabold text-blue-950 text-base sm:text-lg tracking-wide uppercase">
+                            CLUB DEPORTIVO, SOCIAL Y CULTURAL<br>MAXIBÁSQUETBOL OSORNO
+                        </h2>
+                        <p class="text-xs text-slate-500 font-medium mt-1">Personalidad Jurídica Vigente – Osorno, Chile</p>
+                    </div>
+                    <div class="text-right text-xs text-slate-500">
+                        <p class="font-semibold text-slate-700">"Osorno, 02 de septiembre de 2026"</p>
+                    </div>
+                </div>
+
+                <!-- Destinatario -->
+                <div class="mb-6 text-xs sm:text-sm space-y-0.5">
+                    <p class="font-bold text-slate-900">SEÑOR</p>
+                    <p class="font-extrabold text-blue-900 text-base">CARLOS URIBE SOTO</p>
+                    <p class="font-semibold text-slate-700">PRESIDENTE</p>
+                    <p class="font-semibold text-slate-700">CONSEJO LOCAL DE DEPORTES DE OSORNO (COLODEP)</p>
+                    <p class="underline font-bold text-slate-800">PRESENTE</p>
+                </div>
+
+                <!-- Cuerpo de la carta -->
+                <div class="space-y-4 text-justify text-slate-700">
+                    <p><strong class="text-slate-900">De nuestra consideración:</strong></p>
+                    
+                    <p>
+                        Junto con saludarle cordialmente, el Directorio del <strong>Club Deportivo, Social y Cultural Maxibásquetbol Osorno</strong> se dirige a usted para exponer y solicitar respetuosamente lo siguiente:
+                    </p>
+
+                    <p>
+                        Nuestra entidad deportiva, sin fines de lucro, se encuentra abocada en la organización de una jornada conmemorativa y deportiva que contempla la realización del <strong>2do. Campeonato Mario Negrón Molina (Q. E. P. D.)</strong>, evento a realizarse los días <strong>viernes 02 y sábado 03 de octubre</strong> en dependencias del Gimnasio del Liceo Bicentenario de Excelencia Eleuterio Ramírez de Osorno.
+                    </p>
+
+                    <p>
+                        En este certamen participarán los elencos del <em>Club Deportivo Fusión</em> (Puerto Montt), <em>Club Deportivo Gimnástico Alemán</em> (Llanquihue), <em>Club Deportivo Atlético Llanquihue</em> (Osorno) y nuestra institución anfitriona. Dicha actividad culminará el sábado 03 de octubre con una Cena de Camaradería en el Salón de Eventos de la ex Cruz Roja de Mujeres (calle Bilbao) para 70 personas, estimando un gasto aproximado de <strong>$1.200.000.-</strong>
+                    </p>
+
+                    <p>
+                        Posteriormente, en el marco de nuestro plan de trabajo anual, se ha programado una ceremonia de homenaje y reconocimiento a cuatro destacados exponentes del baloncesto local y nacional: <strong>Benjamín Henríquez Negrón</strong>, <strong>Eduardo Céspedes Santibáñez</strong>, <strong>Edilberto "Toto" López</strong> y <strong>Armando "Tata" Rosas</strong>. Esta actividad se realizará el <strong>sábado 14 de noviembre de 2026</strong> a las 19:00 hrs. en el Centro de Eventos "Club Osorno" (García Hurtado N° 959), reuniendo a 60 asistentes. El costo estimado global asciende a <strong>$2.700.000.-</strong>
+                    </p>
+
+                    <p>
+                        En atención a lo expuesto, solicitamos a usted, en su calidad de Presidente del Consejo Local de Deportes, la posibilidad de colaborar con un <strong>aporte económico o logístico</strong> que permita financiar parte del costo de estas actividades.
+                    </p>
+
+                    <p>
+                        Agradeciendo de antemano su constante apoyo al deporte local, le saludan muy atentamente,
+                    </p>
+                </div>
+
+                <!-- FIRMAS CENTRADAS -->
+                <div class="mt-16 pt-6 grid grid-cols-2 gap-8 text-center max-w-2xl mx-auto">
+                    <div class="flex flex-col items-center">
+                        <div class="w-48 border-b border-slate-900 mb-2"></div>
+                        <p class="font-bold text-slate-900 text-xs sm:text-sm">FELIPE ESCOBAR ALIAGA</p>
+                        <p class="text-xs text-slate-600 font-medium">Secretario</p>
+                        <p class="text-[11px] text-slate-400">Club Maxibásquetbol Osorno</p>
+                    </div>
+
+                    <div class="flex flex-col items-center">
+                        <div class="w-48 border-b border-slate-900 mb-2"></div>
+                        <p class="font-bold text-slate-900 text-xs sm:text-sm">LUIS ATILIO VIDAL MUÑOZ</p>
+                        <p class="text-xs text-slate-600 font-medium">Presidente</p>
+                        <p class="text-[11px] text-slate-400">Club Maxibásquetbol Osorno</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER INSTITUCIONAL -->
+    <footer class="bg-navy-950 border-t border-blue-900/40 text-slate-400 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-3">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-900/30 border border-blue-800/40 text-blue-300 font-bold text-xs sm:text-sm">
+                <i class="fa-solid fa-address-card text-orange-400"></i> INFORMACIÓN DE CONTACTO INSTITUCIONAL
+            </div>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 text-xs sm:text-sm font-medium text-slate-300">
+                <a href="tel:+56985360614" class="hover:text-orange-400 transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-phone text-orange-500"></i> Teléfono: +56 9 8536 0614
+                </a>
+                <span class="hidden sm:inline text-slate-700">•</span>
+                <a href="mailto:maxibasquetbol.osorno@gmail.com" class="hover:text-orange-400 transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-envelope text-blue-400"></i> Correo Electrónico: maxibasquetbol.osorno@gmail.com
+                </a>
+            </div>
+
+            <p class="text-[11px] text-slate-500 pt-2">
+                © 2026 Club Deportivo, Social y Cultural Maxibásquetbol Osorno - Todos los derechos reservados.
+            </p>
+        </div>
+    </footer>
+
+    <!-- LÓGICA DE INTERACCIÓN Y GRÁFICOS -->
+    <script>
+        // Cambio de pestañas
+        function switchTab(tab) {
+            const dashboardView = document.getElementById('view-dashboard');
+            const cartaView = document.getElementById('view-carta');
+            const tabDash = document.getElementById('tab-dashboard');
+            const tabCarta = document.getElementById('tab-carta');
+
+            if (tab === 'dashboard') {
+                dashboardView.classList.remove('hidden');
+                cartaView.classList.add('hidden');
+                tabDash.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-blue-600 text-white shadow-lg shadow-blue-600/30";
+                tabCarta.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-blue-300 hover:text-white hover:bg-navy-800";
+            } else {
+                dashboardView.classList.add('hidden');
+                cartaView.classList.remove('hidden');
+                tabCarta.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-blue-600 text-white shadow-lg shadow-blue-600/30";
+                tabDash.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-blue-300 hover:text-white hover:bg-navy-800";
+            }
+        }
+
+        // Configuración de Chart.js
+        window.onload = function() {
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['2do Cto. M. Negrón ($1.2M)', 'Cena Homenaje Leyendas ($2.7M)'],
+                    datasets: [{
+                        data: [1200000, 2700000],
+                        backgroundColor: [
+                            '#f97316', // Naranja baloncesto
+                            '#10b981'  // Verde esmeralda
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#0a152d'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#94a3b8',
+                                font: {
+                                    family: 'Inter',
+                                    size: 11
+                                },
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let value = context.raw;
+                                    return ' $' + value.toLocaleString('es-CL');
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        };
+    </script>
+</body>
+</html>
